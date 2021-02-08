@@ -4,7 +4,11 @@ import { persistStore } from 'redux-persist';
 
 import rootReducer from './root-reducer';
 
-const middlewares = [logger];
+const middlewares = [];
+
+if (process.env.NODE_ENV === 'development') { // allow to log data to console ONLY in 'development' mode
+  middlewares.push(logger);
+}
 
 export const store = createStore(
   rootReducer,
@@ -12,3 +16,9 @@ export const store = createStore(
 );
 
 export const persistor = persistStore(store);
+
+// eslint-disable-next-line import/no-anonymous-default-export
+export default {
+  store,
+  persistStore,
+};
