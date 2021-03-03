@@ -11,30 +11,43 @@ import CheckoutPage from './pages/checkout/checkout';
 import {
   auth,
   createUserProfileDocument,
+  addCollectionAndDocuments,
 } from './firebase/firebase.utils';
 import { setCurrentUser } from './redux/user/user.actions';
 import { selectCurrentUser } from './redux/user/user.selectors';
+import { selectSelectionsForPreview } from './redux/shop/shop.selectors';
 import './App.css';
 
 class App extends Component {
   unSubscribedFromAuth = null;
 
   componentDidMount() {
-    const { setCurrentUser } = this.props;
+    const {
+      setCurrentUser,
+      collections,
+    } = this.props;
+
     this.unSubscribedFromAuth = auth.onAuthStateChanged(async (userAuth) => {
       let userRef = null;
       if (userAuth) {
         userRef = await createUserProfileDocument(userAuth);
 
-        userRef?.onSnapshot((snapShot) => {
+        userRef.onSnapshot((snapShot) => {
           setCurrentUser({
             id: snapShot.id,
             ...snapShot.data()   
           });
         })
-      } else {
-        setCurrentUser(userAuth);
       }
+
+      setCurrentUser(userAuth);
+
+      // we need uncomment to put collection in DB
+
+      // console.log('collections ', collections);
+      // addCollectionAndDocuments('collections', collections.map(
+      //   ({ title, items }) => ({ title, items }))
+      // );
     });
   }
 
@@ -63,7 +76,8 @@ class App extends Component {
 }
 
 const mapStateToProps = createStructuredSelector({
-  currentUser: selectCurrentUser
+  currentUser: selectCurrentUser,
+  // collections: selectSelectionsForPreview,
 });
 
 const mapDispatchToProps = dispatch => ({
